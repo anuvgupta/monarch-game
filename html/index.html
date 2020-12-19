@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>monarchy</title>
+        <meta charset="UTF-8" />
+        <meta name="author" content="Anuv Gupta" />
+        <meta name="copyright" content="Copyright (c) 2020 Anuv Gupta" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=0.695, maximum-scale=0.695, user-scalable=no"
+        />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="icon" href="img/net.png" />
+        <link rel="stylesheet" href="style.css" />
+        <script type="text/javascript" src="lib/jquery-3.5.1.min.js"></script>
+        <script type="text/javascript" src="lib/block.js"></script>
+        <script type="text/javascript" src="lib/util.js"></script>
+        <script type="text/javascript" src="app.js"></script>
+    </head>
+    <body>
+        <!-- game -->
+        <div
+            id="loading"
+            style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: table;
+                text-align: center;
+                opacity: 1;
+                transition: opacity 0.1s ease;
+            "
+        >
+            <div
+                style="
+                    display: table-cell;
+                    vertical-align: middle;
+                    margin: 0 auto;
+                "
+            >
+                <img
+                    src="img/loading.svg"
+                    id="loadingimg"
+                    style="
+                        width: 55%;
+                        max-width: 50px;
+                        opacity: 0.75;
+                        transition: opacity 0.5s ease;
+                        transform: rotate(160deg);
+                    "
+                />
+            </div>
+        </div>
+    </body>
+</html>

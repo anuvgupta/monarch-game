@@ -1,0 +1,407 @@
+    *
+
+// game main blockfile
+
+// app UI content layer
+app
+    id app
+    css
+        opacity 1
+        transition opacity 0.4s
+        height 100%
+        width 100%
+        overflow hidden
+        margin 0 auto
+        box-sizing border-box
+        position relative
+    #auth
+        {
+            if (auth === true) {
+                app.ws.api.auth = true;
+                var name = prompt("Enter Name: ");
+                if (name != null) {
+                    app.ws.api.setName(`${name}`);
+                }
+            }
+        }
+    #name
+        {
+            if (name != false) {
+                app.main.id = `${name.id}`;
+                app.main.name = `${name.name}`;
+                block.child('main/panel/name/text').html('').data(app.main.name);
+                app.ws.api.requestConfig();
+            }
+        }
+    #config
+        {
+            app.canvas.data.monarchHeight = config.monarchHeight;
+            app.canvas.data.monarchWidth = config.monarchWidth;
+            app.canvas.data.playerHeight = config.playerHeight;
+            app.canvas.data.playerWidth = config.playerWidth;
+            app.canvas.data.elephantHeight = config.elephantHeight;
+            app.canvas.data.elephantWidth = config.elephantWidth;
+            app.canvas.data.groundHeight = config.groundHeight;
+            app.canvas.data.groundPadding = config.groundPadding;
+            app.canvas.data.groundColorA = config.groundColorA;
+            app.canvas.data.groundColorB = config.groundColorB;
+            app.canvas.data.skyColor = config.skyColor;
+
+            block.child('login').on('hide');
+            block.child('main').on('show');
+            app.main.start_game();
+        }
+    #elephant
+        {
+            app.canvas.animateElephant();
+        }
+    #death
+        {
+            var text = "";
+            if (death.last_jumper == null)
+                text = "You died! Play again?";
+            else text = `You died! You were killed by ${death.last_jumper.name}. Play again?`;
+            alert(text);
+            app.ws.api.logout();
+        }
+    #notif
+        {
+            if (notif != null && (`${notif}`).trim() != "") {
+                app.canvas.data.notif_timer = app.canvas.data.notif_timer_reset * 1000 / 10;
+                block.child('main/notifs').data({
+                    notif: notif
+                });
+            }
+        }
+    block login
+        :show
+            {
+                block.css('display', 'table');
+                event.stopPropagation();
+            }
+        :hide
+            {
+                block.css('display', 'none');
+                event.stopPropagation();
+            }
+        css
+            margin 0
+            opacity 1
+        html
+            `
+                <div
+                    id="loading"
+                    style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        display: table;
+                        text-align: center;
+                        opacity: 1;
+                        transition: opacity 0.1s ease;
+                    "
+                >
+                    <div
+                        style="
+                            display: table-cell;
+                            vertical-align: middle;
+                            margin: 0 auto;
+                        "
+                    >
+                        <img
+                            src="img/loading.svg"
+                            id="loadingimg"
+                            style="
+                                width: 55%;
+                                max-width: 50px;
+                                opacity: 0.9;
+                                transition: opacity 0.5s ease;
+                            "
+                        />
+                    </div>
+                </div>
+            `
+    div main
+        :show
+            {
+                block.css('display', 'block');
+                event.stopPropagation();
+            }
+        :hide
+            {
+                block.css('display', 'none');
+                event.stopPropagation();
+            }
+        css
+            margin 0
+            opacity 1
+            display none
+            position relative
+        :init
+            {
+                block.child('title').on('fadein')
+                    .sibling('panel').on('fadein')
+                    .sibling('leaderboard').on('fadein')
+                    .sibling('notifs').on('fadein')
+                ;
+            }
+        #score
+            {
+                block.child('panel/score/text').html('').data(`${score}`);
+            }
+        #health
+            {
+                block.child('panel/health/bar/sub_bar').data({
+                    health: health
+                });
+            }
+        canvas canvas
+            id canvas
+            width 100px
+            height 100px
+            css
+                width 100px
+                height 100px
+                border none
+                margin 0
+                box-sizing border-box
+                outline none
+            tabindex 0
+            :keydown
+                {
+                    switch (event.keyCode) {
+                        case 32:
+                            // jump
+                            app.ws.api.sendMovement('j');
+                            break;
+                        case 37:
+                            // left
+                            app.main.move('l');
+                            break;
+                        case 39:
+                            // right
+                            app.main.move('r');
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            :keyup
+                {
+                    switch (event.keyCode) {
+                        case 32:
+                            // jump
+                            break;
+                        case 37:
+                            // left
+                            if (app.main.move_dir == -1)
+                                app.main.stop();
+                            break;
+                        case 39:
+                            // right
+                            if (app.main.move_dir == 1)
+                                app.main.stop();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            @query window height != 0
+                {
+                    block.attribute("width", `${window.innerWidth}px`);
+                    block.attribute("height", `${window.innerHeight}px`);
+                    block.css("width", `${window.innerWidth}px`);
+                    block.css("height", `${window.innerHeight}px`);
+                }
+        block title
+            css
+                position absolute
+                bottom 3px
+                left 40px
+                width 100%
+                height 180px
+                pointer-events none
+                -webkit-touch-callout none
+                -webkit-user-select none
+                -khtml-user-select none
+                -moz-user-select none
+                -ms-user-select none
+                user-select none
+                transition opacity 0.5s ease
+                opacity 0
+            {
+                block.__child('content').css('text-align', 'left');
+            }
+            :fadein
+                css
+                    opacity 1
+            text text
+                val monarchy
+                css
+                    text-transform lowercase
+                    font-size 116px
+                    font-weight bold
+                    font-family Verdana, Trebuchet
+                    opacity 0.2
+        div panel
+            css
+                position absolute
+                bottom 0
+                right 20px
+                height 180px
+                width 180px
+                //border-radius 0 10px 0 0
+                transition opacity 0.5s ease
+                opacity 0
+                pointer-events none
+                -webkit-touch-callout none
+                -webkit-user-select none
+                -khtml-user-select none
+                -moz-user-select none
+                -ms-user-select none
+                user-select none
+            :fadein
+                css
+                    opacity 1
+            div spacer
+                css
+                    height 15px
+            block name
+                css
+                    height 30px
+                text text
+                    css
+                        font-weight bold
+                        font-size 21px
+                        color rgba(56, 48, 37, 0.6)
+                    val player
+            block score
+                css
+                    height 115px
+                    margin-top -22px
+                text text
+                    css
+                        font-weight bold
+                        font-size 105px
+                        color rgba(56, 48, 37, 0.45)
+                    val 0
+            block health
+                css
+                    height 40px
+                    margin-top -18px
+                block bar
+                    css
+                        height 50%
+                        width 80%
+                        background-color rgba(56, 48, 37, 0.45)
+                        margin 0 auto
+                    block sub_bar
+                        css
+                            height 50%
+                            width 92.5%
+                            background-color rgba(105, 11, 3, 0.4)
+                            margin 0 auto
+                        #health
+                            {
+                                var width = 0.925 * block.parent().$().width() * health / 100.0;
+                                block.css('width', `${width}px`);
+                            }
+        div leaderboard
+            css
+                position absolute
+                bottom 0
+                right 200px
+                height 180px
+                width 180px
+                transition opacity 0.5s ease
+                opacity 0
+                pointer-events none
+                -webkit-touch-callout none
+                -webkit-user-select none
+                -khtml-user-select none
+                -moz-user-select none
+                -ms-user-select none
+                user-select none
+            :fadein
+                css
+                    opacity 1
+            div spacer
+                css
+                    height 20px
+            div board
+                text title
+                    val Leaderboard
+                    css
+                        font-weight bold
+                        font-size 23px
+                        color rgba(56, 48, 37, 0.6)
+                break br1
+                    // break
+                text text
+                    css
+                        font-size 20px
+                        color rgba(56, 48, 37, 0.6)
+                    html
+                        `
+                            1. ___
+                        `
+                    :update
+                        {
+                            var leaderboard = app.main.game_data.leaderboard;
+                            var text = "";
+                            var i = 1;
+                            for (var p in leaderboard) {
+                                if (leaderboard.hasOwnProperty(p)) {
+                                    text += `${i}. ${leaderboard[p].name}<br/>`;
+                                    i++;
+                                }
+                            }
+                            block.html(text);
+                        }
+        div notifs
+            $cleared no
+            css
+                position absolute
+                top 15px
+                left 20px
+                height 100px
+                width 500px
+                transition opacity 0.5s ease
+                opacity 0
+                pointer-events none
+                -webkit-touch-callout none
+                -webkit-user-select none
+                -khtml-user-select none
+                -moz-user-select none
+                -ms-user-select none
+                user-select none
+            :fadein
+                css
+                    opacity 1
+            :clear
+                {
+                    if (block.key("cleared") == "no") {
+                        block.key("cleared", "yes");
+                        block.css('opacity', '0');
+                        setTimeout(_ => {
+                            block.child('text').html('');
+                            setTimeout(_ => {
+                                block.css('opacity', '1');
+                            }, 200);
+                        }, 600);
+                    }
+                }
+            #notif
+                {
+                    block.key("cleared", "no");
+                    block.css('opacity', '1');
+                    block.child('text').html('').html(`${notif}`);
+                }
+            text text
+                css
+                    font-size 23px
+                    font-weight bold
+                    color rgba(56, 48, 37, 0.6)
+                html &nbsp;

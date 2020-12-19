@@ -1,0 +1,31 @@
+{
+    "http_port": 3014,
+    "ws_port": 3015,
+    "game": {
+        "gravityVec": [0, -0.7],
+        "playerVelocity": [20, 0],
+        "jumpVelocity": [0, 17],
+        "jumpMultiplier": 1.15,
+        "jumpLimit": 3,
+        "monarchHeight": 20,
+        "monarchWidth": 20,
+        "playerHeight": 50,
+        "playerWidth": 50,
+        "elephantHeight": 300,
+        "elephantWidth": 300,
+        "skyColor": "#93c3e8",
+        "groundHeight": 180,
+        "groundPadding": 2,
+        "groundColorA": "#6a573f",
+        "groundColorB": "#306327",
+        "butterflyGenLowerLimit": 30,
+        "butterflyGenUpperLimit": 200,
+        "butterflyXDistanceLimit": 1500,
+        "butterflyXGenDistanceLimit": 25,
+        "butterflyYDistanceLimit": 1000,
+        "butterflyYGenDistanceLimit": 800,
+        "butterflyLifespan": 20,
+        "playerInvincibleTime": 3,
+        "jumpHealthCost": 20
+    }
+}
